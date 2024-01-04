@@ -3,6 +3,7 @@ module github.com/skhatri/go-connectors
 go 1.21.5
 
 require (
+	github.com/lib/pq v1.10.9
 	github.com/skhatri/go-fns v0.1.0
 	github.com/skhatri/go-logger v0.1.0
 )

@@ -3,6 +3,7 @@ package pg
 import (
 	"database/sql"
 	"fmt"
+	_ "github.com/lib/pq"
 	"github.com/skhatri/go-connectors/lib/conn"
 	"github.com/skhatri/go-logger/logging"
 )
