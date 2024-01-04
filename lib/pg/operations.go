@@ -39,7 +39,7 @@ type DbSession struct {
 	db *sql.DB
 }
 
-func (ds *DbSession) Execute(connStr string, command string, args ...any) (int64, error) {
+func (ds *DbSession) Execute(command string, args ...any) (int64, error) {
 	result, err := ds.db.Exec(command)
 	if err != nil {
 		log.WithTask("execute-db-command").WithMessage("could not execute command").WithError(err)
