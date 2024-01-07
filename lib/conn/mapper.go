@@ -27,12 +27,20 @@ func ParseParameters(opts map[string]interface{}, defaultPort int) *ConnectionPa
 	if sslFlag, ok := opts["ssl"]; ok && fmt.Sprintf("%v", sslFlag) == "true" {
 		ssl = true
 	}
-	secret, secretErr := fs.ParsePasswordEntry(opts["password"].(string))
-	if secretErr != nil {
-		LOG.WithTask("read-file-data").Fatalf("%s", "could not read password file")
+	username := ""
+	secret := ""
+	if usr, ok := opts["username"]; ok {
+		username = fmt.Sprintf("%v", usr)
 	}
+	if scr, ok := opts["password"]; ok {
+		secretEntry, secretErr := fs.ParsePasswordEntry(scr.(string))
+		if secretErr != nil {
+			LOG.WithTask("read-file-data").Fatalf("%s", "could not read password file")
+		}
+		secret = secretEntry
+	}
+
 	host := fmt.Sprintf("%v", opts["host"])
-	username := fmt.Sprintf("%v", opts["username"])
 
 	port := defaultPort
 	if pValue, ok := opts["port"]; ok {
