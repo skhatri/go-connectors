@@ -27,18 +27,8 @@ func ParseParameters(opts map[string]interface{}, defaultPort int) *ConnectionPa
 	if sslFlag, ok := opts["ssl"]; ok && fmt.Sprintf("%v", sslFlag) == "true" {
 		ssl = true
 	}
-	username := ""
-	secret := ""
-	if usr, ok := opts["username"]; ok {
-		username = fmt.Sprintf("%v", usr)
-	}
-	if scr, ok := opts["password"]; ok {
-		secretEntry, secretErr := fs.ParsePasswordEntry(scr.(string))
-		if secretErr != nil {
-			LOG.WithTask("read-file-data").Fatalf("%s", "could not read password file")
-		}
-		secret = secretEntry
-	}
+	username := readMaybeFromFile(opts, "username")
+	secret := readMaybeFromFile(opts, "password")
 
 	host := fmt.Sprintf("%v", opts["host"])
 
@@ -60,4 +50,16 @@ func ParseParameters(opts map[string]interface{}, defaultPort int) *ConnectionPa
 		Ssl:      ssl,
 		Database: dbname,
 	}
+}
+
+func readMaybeFromFile(opts map[string]interface{}, key string) string {
+	result := ""
+	if scr, ok := opts[key]; ok {
+		value, err := fs.ParsePasswordEntry(scr.(string))
+		if err != nil {
+			LOG.WithTask("read-file-data").Fatalf("%s", "could not read value from file")
+		}
+		result = value
+	}
+	return result
 }
