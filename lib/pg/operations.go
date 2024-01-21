@@ -3,7 +3,7 @@ package pg
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
 	"github.com/skhatri/go-connectors/lib/conn"
 	"github.com/skhatri/go-logger/logging"
 )
@@ -41,7 +41,13 @@ type DbSession struct {
 }
 
 func (ds *DbSession) Execute(command string, args ...any) (int64, error) {
-	result, err := ds.db.Exec(command)
+	var result sql.Result
+	var err error
+	if len(args) > 0 {
+		result, err = ds.db.Exec(command, pq.Array(args))
+	} else {
+		result, err = ds.db.Exec(command)
+	}
 	if err != nil {
 		log.WithTask("execute-db-command").WithMessage("could not execute command").WithError(err)
 		return 0, err
@@ -49,8 +55,14 @@ func (ds *DbSession) Execute(command string, args ...any) (int64, error) {
 	return result.RowsAffected()
 }
 
-func (ds *DbSession) Query(query string, rowMapper func(*sql.Rows) error) error {
-	rows, rerr := ds.db.Query(query)
+func (ds *DbSession) Query(query string, rowMapper func(*sql.Rows) error, args ...any) error {
+	var rows *sql.Rows
+	var rerr error
+	if len(args) > 0 {
+		rows, rerr = ds.db.Query(query, pq.Array(args))
+	} else {
+		rows, rerr = ds.db.Query(query)
+	}
 	if rerr != nil {
 		log.WithTask("query-schema").WithMessage("could not query for schema data").WithError(rerr)
 		return rerr
