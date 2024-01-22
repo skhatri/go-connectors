@@ -3,7 +3,7 @@ package pg
 import (
 	"database/sql"
 	"fmt"
-	"github.com/lib/pq"
+	_ "github.com/lib/pq"
 	"github.com/skhatri/go-connectors/lib/conn"
 	"github.com/skhatri/go-logger/logging"
 )
@@ -44,7 +44,7 @@ func (ds *DbSession) Execute(command string, args ...any) (int64, error) {
 	var result sql.Result
 	var err error
 	if len(args) > 0 {
-		result, err = ds.db.Exec(command, pq.Array(args))
+		result, err = ds.db.Exec(command, args...)
 	} else {
 		result, err = ds.db.Exec(command)
 	}
@@ -59,7 +59,7 @@ func (ds *DbSession) Query(query string, rowMapper func(*sql.Rows) error, args .
 	var rows *sql.Rows
 	var rerr error
 	if len(args) > 0 {
-		rows, rerr = ds.db.Query(query, pq.Array(args))
+		rows, rerr = ds.db.Query(query, args...)
 	} else {
 		rows, rerr = ds.db.Query(query)
 	}
