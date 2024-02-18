@@ -15,12 +15,20 @@ func parseConnectionOptions(opts map[string]interface{}) (*conn.ConnectionParame
 		opts["database"] = "postgres"
 	}
 	connParams := conn.ParseParameters(opts, 5432)
+	certs := ""
 	sslmode := "disable"
 	if connParams.Ssl {
-		sslmode = "require"
+		sslmode = "verify-full"
+		certs = " "
+		if keyfile, ok := opts["key"]; ok {
+			certs = fmt.Sprintf("%s sslkey=%v", certs, keyfile)
+		}
+		if certfile, ok := opts["cert"]; ok {
+			certs = fmt.Sprintf("%s sslcert=%v", certs, certfile)
+		}
 	}
-	connStr := fmt.Sprintf("user=%s password=%s host=%s port=%d sslmode=%s dbname=%s",
-		connParams.Username, connParams.Password, connParams.Host, connParams.Port, sslmode, connParams.Database)
+	connStr := fmt.Sprintf("user=%s password=%s host=%s port=%d sslmode=%s dbname=%s%s",
+		connParams.Username, connParams.Password, connParams.Host, connParams.Port, sslmode, connParams.Database, certs)
 	return connParams, connStr
 }
 
