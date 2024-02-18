@@ -20,11 +20,14 @@ func parseConnectionOptions(opts map[string]interface{}) (*conn.ConnectionParame
 	if connParams.Ssl {
 		sslmode = "verify-full"
 		certs = " "
-		if keyfile, ok := opts["key"]; ok {
+		if keyfile, ok := opts["keyfile"]; ok {
 			certs = fmt.Sprintf("%s sslkey=%v", certs, keyfile)
 		}
-		if certfile, ok := opts["cert"]; ok {
+		if certfile, ok := opts["certfile"]; ok {
 			certs = fmt.Sprintf("%s sslcert=%v", certs, certfile)
+		}
+		if cafile, ok := opts["cafile"]; ok {
+			certs = fmt.Sprintf("%s sslrootcert=%v", certs, cafile)
 		}
 	}
 	connStr := fmt.Sprintf("user=%s password=%s host=%s port=%d sslmode=%s dbname=%s%s",
