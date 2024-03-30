@@ -30,7 +30,10 @@ func ParseParameters(opts map[string]interface{}, defaultPort int) *ConnectionPa
 	username := readMaybeFromFile(opts, "username")
 	secret := readMaybeFromFile(opts, "password")
 
-	host := fmt.Sprintf("%v", opts["host"])
+  var host string
+  if _, ok := opts["host"]; ok {
+	  host = fmt.Sprintf("%v", opts["host"])
+  }
 
 	port := defaultPort
 	if pValue, ok := opts["port"]; ok {
